@@ -64,18 +64,32 @@ public class CrudSqlSessionFactory implements SqlSessionFactory{
     }
 
     @Override
-    public SqlSession openSession(ExecutorType executorType, boolean b) {
-        return wrap(sqlSessionFactory.openSession(executorType, b));
+    public SqlSession openSession(ExecutorType executorType, boolean autoCommit) {
+        CrudSqlSession sqlSession = wrap(sqlSessionFactory.openSession(executorType, autoCommit));
+        sqlSession.getCrudConfiguration().setAutoCommit(autoCommit);
+        return sqlSession;
     }
 
     @Override
     public SqlSession openSession(ExecutorType executorType, TransactionIsolationLevel transactionIsolationLevel) {
-        return wrap(sqlSessionFactory.openSession(executorType, transactionIsolationLevel));
+        CrudSqlSession sqlSession = wrap(sqlSessionFactory.openSession(executorType, transactionIsolationLevel));
+        sqlSession.getCrudConfiguration().setAutoCommit(false);
+        return sqlSession;
     }
 
     @Override
     public SqlSession openSession(ExecutorType executorType, Connection connection) {
-        return wrap(sqlSessionFactory.openSession(executorType, connection));
+        boolean autoCommit;
+        try {
+            autoCommit = connection.getAutoCommit();
+        } catch (SQLException e) {
+            // Failover to true, as most poor drivers
+            // or databases won't support transactions
+            autoCommit = true;
+        }
+        CrudSqlSession sqlSession = wrap(sqlSessionFactory.openSession(executorType, connection));
+        sqlSession.getCrudConfiguration().setAutoCommit(autoCommit);
+        return sqlSession;
     }
 
     @Override
