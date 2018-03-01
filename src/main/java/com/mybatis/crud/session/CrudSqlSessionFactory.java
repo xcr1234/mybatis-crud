@@ -4,6 +4,7 @@ import com.mybatis.crud.config.CrudConfiguration;
 import org.apache.ibatis.session.*;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * 默认SqlSessionFactory的代理类，可以分离出{@link CrudSqlSession}
@@ -37,7 +38,17 @@ public class CrudSqlSessionFactory implements SqlSessionFactory{
 
     @Override
     public SqlSession openSession(Connection connection) {
-        return wrap(sqlSessionFactory.openSession(connection));
+        boolean autoCommit;
+        try {
+            autoCommit = connection.getAutoCommit();
+        } catch (SQLException e) {
+            // Failover to true, as most poor drivers
+            // or databases won't support transactions
+            autoCommit = true;
+        }
+        CrudSqlSession sqlSession = wrap(sqlSessionFactory.openSession(connection));
+        sqlSession.getCrudConfiguration().setAutoCommit(autoCommit);
+        return sqlSession;
     }
 
     @Override
