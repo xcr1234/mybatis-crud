@@ -22,7 +22,7 @@ Why not Hibernate ？
 
 jar包：
 
-[mybatis-crud.jar](mybatis-crud.jar)
+[mybatis-crud.jar](https://github.com/xcr1234/mybatis-crud/blob/master/mybatis-crud.jar?raw=true)
 
 如果使用Maven，推荐使用源码依赖的方式：
 
