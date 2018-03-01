@@ -31,6 +31,9 @@ public class CrudSqlSession implements SqlSession{
         this.configuration = configuration;
     }
 
+    public CrudConfiguration getCrudConfiguration(){
+        return configuration;
+    }
 
     @Override
     public <T> T selectOne(String s) {

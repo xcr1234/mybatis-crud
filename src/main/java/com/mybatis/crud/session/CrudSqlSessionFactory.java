@@ -29,8 +29,10 @@ public class CrudSqlSessionFactory implements SqlSessionFactory{
     }
 
     @Override
-    public SqlSession openSession(boolean b) {
-        return wrap(sqlSessionFactory.openSession(b));
+    public SqlSession openSession(boolean autoCommit) {
+        CrudSqlSession sqlSession = wrap(sqlSessionFactory.openSession(autoCommit));
+        sqlSession.getCrudConfiguration().setAutoCommit(autoCommit);
+        return sqlSession;
     }
 
     @Override
@@ -40,7 +42,9 @@ public class CrudSqlSessionFactory implements SqlSessionFactory{
 
     @Override
     public SqlSession openSession(TransactionIsolationLevel transactionIsolationLevel) {
-        return wrap(sqlSessionFactory.openSession(transactionIsolationLevel));
+        CrudSqlSession sqlSession = wrap(sqlSessionFactory.openSession(transactionIsolationLevel));
+        sqlSession.getCrudConfiguration().setAutoCommit(false);
+        return sqlSession;
     }
 
     @Override
@@ -72,7 +76,7 @@ public class CrudSqlSessionFactory implements SqlSessionFactory{
         return sqlSessionFactory;
     }
 
-    private SqlSession wrap(SqlSession sqlSession){
+    private CrudSqlSession wrap(SqlSession sqlSession){
         return new CrudSqlSession(sqlSession,configuration);
     }
 }
